@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="photo-sphere-viewer.min.css"/>
+    <title>全景图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            box-sizing: border-box;
+            text-decoration: none;
+            border: 0;
+            outline: 0;
+        }
+
+        .main {
+
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .main h3 {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .next-button {
+            width: 70px;
+            text-align: center;
+        }
+    </style>
+    <script src="./three.min.js"></script>
+    <script src="D.min.js"></script>
+    <script src="uevent.min.js"></script>
+    <script src="doT.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="gyroscope.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./photo-sphere-viewer.min.js"></script>
+
+</head>
+<body>
+<div class="main">
+    <h3 id="title">
+        室内图1
+    </h3>
+    <div id="container"></div>
+</div>
+
+<script>
+    var viewer;
+    var canvasHeight;
+    var imgArr = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg'];
+    var captionArr = ['室内图1', '室内图2', '花海', '上海夜景', '教堂', '游戏图', '张家界', '太空航拍', '海底世界', '珠穆朗玛峰'];
+    var index = 0;
+    //必须在服务器上才能看到效果！
+    window.onload = function () {
+        getTitleHeight();
+        loadingAllImg();
+        viewer.zoom(0);
+    }
+    //让全景图刚好撑满屏幕
+    var title = document.getElementById('title');
+    function getTitleHeight() {
+        var titleHeight = parseFloat(getComputedStyle(title).height);
+        var maxHeight = window.innerHeight;
+        canvasHeight = parseFloat(maxHeight - titleHeight) + 'px';
+    }
+    //全景图参数配置函数
+    function loadingAllImg() {
+        var div = document.getElementById('container');
+        viewer = new PhotoSphereViewer({
+            // 全景图的完整路径
+            panorama: [imgArr[index]],
+            caption: captionArr[index],
+            // 放全景图的元素
+            container: div,
+            // 可选，默认值为2000，全景图在time_anim毫秒后会自动进行动画。（设置为false禁用它）
+            time_anim: false,
+            gyroscope: true,
+            sphere_segments: 32,
+            // 可选值，默认为false。显示导航条。
+            navbar: [
+//				    'autorotate',
+                'zoom',
+                {
+                    id: 'prev-button',
+                    title: '上一个全景图',
+                    className: 'next-button',
+                    content: '上一全景',
+                    onClick: function () {
+                        index--;
+                        if (index < 0) {
+                            index = imgArr.length - 1
+                        }
+                        viewer.setPanorama(imgArr[index]);
+                        viewer.setCaption(captionArr[index]);
+                        title.innerHTML = captionArr[index];
+                        viewer.render()
+                    }
+                },
+                {
+                    id: 'next-button',
+                    title: '下一个全景图',
+                    className: 'next-button',
+                    content: '下一全景',
+                    onClick: function () {
+                        index++;
+                        if (index == imgArr.length) {
+                            index = 0
+                        }
+                        viewer.setPanorama(imgArr[index]);
+                        viewer.setCaption(captionArr[index]);
+                        title.innerHTML = captionArr[index];
+                        viewer.render()
+                    }
+                },
+                'caption',
+                'gyroscope',
+                'fullscreen'
+            ],
+            // 可选，默认值null，全景图容器的最终尺寸。例如：{width: 500, height: 300}。
+            size: {
+                width: '100%',
+                height: canvasHeight
+            }
+        });
+
+
+    }
+</script>
+</body>
+</html>
